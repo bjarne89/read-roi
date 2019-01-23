@@ -103,21 +103,9 @@ def get_float(data, base):
     return struct.unpack('f', s)[0]
 
 
-def read_roi_file(fpath):
+def read_roi_bytearray(data, name):
     """
     """
-
-    if isinstance(fpath, zipfile.ZipExtFile):
-        data = fpath.read()
-        name = os.path.splitext(os.path.basename(fpath.name))[0]
-    elif isinstance(fpath, str):
-        fp = open(fpath, 'rb')
-        data = fp.read()
-        fp.close()
-        name = os.path.splitext(os.path.basename(fpath))[0]
-    else:
-        logging.error("Can't read {}".format(fpath))
-        return None
 
     logging.debug("Read ROI for \"{}\"".format(name))
 
@@ -166,10 +154,10 @@ def read_roi_file(fpath):
 
     # Untested
     if sub_pixel_rect:
-        xd = getFloat(data, OFFSET['XD'])
-        yd = getFloat(data, OFFSET['YD'])
-        widthd = getFloat(data, OFFSET['WIDTHD'])
-        heightd = getFloat(data, OFFSET['HEIGHTD'])
+        xd = get_float(data, OFFSET['XD'])
+        yd = get_float(data, OFFSET['YD'])
+        widthd = get_float(data, OFFSET['WIDTHD'])
+        heightd = get_float(data, OFFSET['HEIGHTD'])
         logging.debug("Entering in sub_pixel_rect")
 
     # Untested
@@ -324,3 +312,24 @@ def read_roi_zip(zip_path):
     for n in zf.namelist():
         rois.update(read_roi_file(zf.open(n)))
     return rois
+
+
+def read_roi_file(fpath):
+    if isinstance(fpath, zipfile.ZipExtFile):
+        data = fpath.read()
+        name = os.path.splitext(os.path.basename(fpath.name))[0]
+    elif isinstance(fpath, str):
+        fp = open(fpath, 'rb')
+        data = fp.read()
+        fp.close()
+        name = os.path.splitext(os.path.basename(fpath))[0]
+    else:
+        logging.error("Can't read {}".format(fpath))
+        return None
+
+    read_roi_bytearray(data, name)
+
+
+
+
+
